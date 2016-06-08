@@ -1,0 +1,7 @@
+{
+  "devDependencies": {
+    "css-loader": "^0.23.1",
+    "webpack-cordova-plugin": "^0.1.6",
+    "webpack-stream": "^3.2.0"
+  }
+}

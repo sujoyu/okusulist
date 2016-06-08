@@ -1,0 +1,145 @@
+/**/
+
+#myapp nav .brand-logo {
+  position: unset;
+  font-size: 1.3rem;
+  margin-left: 20px;
+  left: unset;
+  transform: unset;
+}
+
+#myapp nav.ios-nav {
+  padding-top: 20px;
+  height: 76px;
+}
+
+.waves-effect.waves-light-purple .waves-ripple {
+  /* The alpha value allows the text and background color
+   of the button to still show through. */
+  background-color: rgba(128,203,196, 0.65);
+}
+
+.container {
+  width: 100%;
+}
+
+.collapsible-header .modal-trigger.delete i {
+  float: right;
+  /*line-height: normal;
+  padding-top: 0.2rem;*/
+  margin-right: 0;
+  color: #eceff1;
+}
+
+/*.collapsible-header {
+  line-height: normal;
+  padding-top: 0.8rem;
+  padding-bottom: 0.8rem;
+}*/
+
+.collapsible-header.active {
+  background-color: #b2ebf2;
+}
+
+.clear {
+  clear: both;
+}
+
+#nav-mobile .material-icons {
+  width: 1em;
+}
+
+#nav-dropdown .material-icons {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.dtp-btn-ok {
+  display: none;
+}
+
+.collapsible .collapsible {
+  margin: 0 0 0 2%;
+}
+
+.first-contents-list {
+  padding: 2% 4%;
+}
+
+.last-contents-list {
+  font-size: small;
+  padding: 2% 4%;
+}
+
+.small {
+  font-size: small;
+}
+
+#list-target-form {
+  margin-left: -9999px;
+  width: 1px;
+  height: 1px;
+  margin-bottom: -1px;
+  overflow: hidden;
+}
+
+#myapp .dtp-disable-day {
+  color: #BDBDBD;
+  cursor: default;
+}
+
+#myapp span.dtp-select-day {
+  cursor: default;
+}
+
+#myapp.index-page .dtp-btn-ok {
+  display: none;
+}
+
+#myapp.user-page .dtp-buttons {
+  font-size: 0.8rem;
+}
+
+#file-chooser .breadcrumb {
+  color: #263238;
+  font-size: 12px;
+}
+
+#file-chooser .breadcrumb:before {
+  color: #009688;
+  font-size: 12px;
+}
+
+#file-chooser .file-list .type-directory {
+  color: #ffc107;
+  padding-right: 0.5rem;
+  font-size: 1.5rem;
+  vertical-align: bottom;
+}
+
+#file-chooser .file-list .type-file {
+  color: #03a9f4;
+  padding-right: 0.5rem;
+  font-size: 1.5rem;
+  vertical-align: bottom;
+}
+
+#file-chooser .type-chevron {
+  vertical-align: bottom;
+  padding: 0;
+  font-size: 1.5rem;
+}
+
+#file-chooser .file-list .file-name {
+  word-wrap: break-word;
+}
+
+#setting-list .material-icons {
+  margin-right: 0.5rem;
+  vertical-align: bottom;
+}
+
+#user-form {
+  padding-top: 2rem;
+  padding-bottom: 3rem;
+}

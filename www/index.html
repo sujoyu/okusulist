@@ -1,0 +1,156 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="Content-Security-Policy" content="default-src * data:; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+
+    <script src="cordova.js"></script>
+    <script src="compiled/app.js"></script>
+
+</head>
+<body id="myapp" class="index-page">
+
+  <nav class="pink accent-1" role="navigation">
+    <div class="nav-wrapper">
+      <a id="logo-container" href="#!" class="brand-logo left">最近の処方</a>
+      <ul class="hide-on-small-only right">
+        <li><a href="#!" id="ScanButton" class="waves-effect waves-light white-text"><i class="material-icons">&#xE439;</i></a></li>
+        <li><a href="#!" id="calendar" class="waves-effect waves-light white-text"><i class="material-icons">event</i></a></li>
+        <li><a href="index.html" class="waves-effect waves-light white-text"><i class="material-icons">list</i></a></li>
+        <li><a href="user.html" class="waves-effect waves-light white-text"><i class="material-icons">&#xE853;</i></a></li>
+        <li><a href="settings.html" class="waves-effect waves-light white-text"><i class="material-icons">settings</i></a></li>
+      </ul>
+
+      <ul id="nav-mobile" class="hide-on-med-and-up right">
+        <li><a href="#!" class="waves-effect waves-light dropdown-button" data-activates="nav-dropdown">
+          <i class="tiny material-icons">&#xE5D4;</i>
+        </a></li>
+      </ul>
+
+      <ul id='nav-dropdown' class='dropdown-content pink accent-1'>
+        <li><a href="#!" id="ScanButton" class="waves-effect waves-light white-text"><i class="material-icons">&#xE439;</i></a></li>
+        <li><a href="#!" id="calendar" class="waves-effect waves-light white-text"><i class="material-icons">event</i></a></li>
+        <li><a href="index.html" class="waves-effect waves-light white-text"><i class="material-icons">list</i></a></li>
+        <li class="divider pink lighten-2"></li>
+        <li><a href="user.html" class="waves-effect waves-light white-text"><i class="material-icons">&#xE853;</i></a></li>
+        <li><a href="settings.html" class="waves-effect waves-light white-text"><i class="material-icons">settings</i></a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <form id="list-target-form">
+    <input type="text" id="list-target"></input>
+  </form>
+
+  <div id="welcome-message" class="card pink lighten-2 hide">
+    <div class="card-content white-text">
+      <span class="card-title">ようこそ！</span>
+      <p>処方箋のQRコードを読んでみよう！<br>
+      タイトルバーの <i class="material-icons">&#xE5D4;</i> から <i class="material-icons">&#xE439;</i> を選んでね。</p>
+    </div>
+  </div>
+
+  <div id="empty-message" class="card pink lighten-2 hide">
+    <div class="card-content white-text">
+      <span class="card-title">処方箋がないよ！</span>
+      <p>指定した日の処方箋がなかったよ。<br>
+      最近の処方一覧に戻りたいときは、
+      タイトルバーの <i class="material-icons">&#xE5D4;</i> から <i class="material-icons">list</i> を選んでね。</p>
+    </div>
+  </div>
+
+  <div class="clear">
+  <ul id="techo" class="collapsible hide" data-collapsible="expandable">
+    <li id="template" class="hide techo-section">
+      <div class="collapsible-header waves-effect waves-light-purple">
+        <i class="material-icons cyan-text accent-icon">&#xE89C;</i>
+        <span class="header-text"></span>
+        <a class="modal-trigger right delete" href="#confirm-delete">
+          <i class="tiny material-icons">delete</i>
+        </a>
+      </div>
+      <div class="collapsible-body blue-grey lighten-5">
+        <div class="first-contents-list">
+          <dl class="row"></dl>
+        </div>
+        <ul class="section-list collapsible" data-collapsible="expandable"></ul>
+        <div class="last-contents-list">
+          <dl class="row"></dl>
+        </div>
+      </div>
+    </li>
+
+  </ul>
+
+  </div>
+
+  <div id="edit-patient-message" class="card pink lighten-2 hide">
+    <div class="card-content white-text">
+      <span class="card-title">あなたについて教えて。</span>
+      <p>アレルギー歴や既往歴などを登録しよう。<br>
+      あなたについて登録するときは、
+      タイトルバーの <i class="material-icons">&#xE5D4;</i> から <i class="material-icons">&#xE853;</i> を選んでね。</p>
+    </div>
+  </div>
+
+    <!-- Modal Structure -->
+    <div id="camera-continue" class="modal">
+      <div class="modal-content">
+        <h4 class="center-align teal-text"><i class="medium material-icons">announcement</i></h4>
+        <p class="">すべて読み込んだ？</p>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="teal-text modal-action modal-close waves-effect waves-green btn-flat complete">読み込んだ</a>
+        <a href="#!" class="blue-grey-text darken-3 waves-effect btn-flat leaving">次を読む</a>
+      </div>
+    </div>
+
+    <div id="save-qrcode" class="modal">
+      <div class="modal-content">
+        <h4 class="center-align teal-text"><i class="medium material-icons">announcement</i></h4>
+        <p class="">ここまでに読み取ったQRコードを保存する？</p>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="teal-text modal-action modal-close waves-effect waves-green btn-flat save">保存する</a>
+        <a href="#!" class="blue-grey-text darken-3 modal-action modal-close waves-effect btn-flat">やめて</a>
+      </div>
+    </div>
+
+    <div id="qrcode-error" class="modal">
+      <div class="modal-content">
+        <h4 class="center-align teal-text"><i class="medium material-icons">announcement</i></h4>
+        <p class="">QRコードを読み取れなかったよ。もう一度試してみて。</p>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="teal-text waves-effect waves-green btn-flat retry">OK</a>
+      </div>
+    </div>
+
+    <div id="confirm-delete" class="modal">
+      <div class="modal-content">
+        <h4 class="center-align teal-text"><i class="medium material-icons">announcement</i></h4>
+        <p class="">削除していいの？</p>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="teal-text modal-action modal-close waves-effect waves-green btn-flat delete">いいよ</a>
+        <a href="#!" class="blue-grey-text darken-3 modal-action modal-close waves-effect btn-flat">やめて</a>
+      </div>
+    </div>
+
+    <div id="file-chooser" class="modal modal-fixed-footer">
+      <div class="modal-content">
+        <p class="center-align teal-text title"></p>
+        <div class="container">
+          <div class="breadcrumbs"></div>
+          <div class="divider"></div>
+          <ul class="collection file-list"></ul>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="teal-text waves-effect waves-green btn-flat choose">決めた</a>
+        <a href="#!" class="blue-grey-text darken-3 modal-action modal-close waves-effect btn-flat">やめた</a>
+      </div>
+    </div>
+</body>
+</html>

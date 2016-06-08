@@ -1,0 +1,8 @@
+/bower_components
+/merges
+/hooks
+/node_modules
+/platforms
+/plugins
+/www/compiled
+.DS_Store
