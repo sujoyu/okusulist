@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.hatenadiary.sujoyu.hellotaco" version="undefined" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.hatenadiary.sujoyu.okusulist" version="undefined" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>okusulist</name>
     <description>電子お薬手帳</description>
     <author email="dev@cordova.apache.org" href="http://cordova.io">Apache Cordova Team</author>
@@ -7,7 +7,9 @@
     <access origin="*" />
     <preference name="SplashScreen" value="screen" />
     <preference name="SplashMaintainAspectRatio" value="false" />
-    <!-- <preference name="SplashScreenDelay" value="1000" /> -->
+    <preference name="AutoHideSplashScreen" value="false" />
+    <preference name="SplashScreenDelay" value="500" />
+    <preference name="FadeSplashScreenDuration" value="300"/>
     <preference name="windows-target-version" value="8.1" />
     <preference name="windows-phone-target-version" value="8.1" />
     <!-- <preference name="iosExtraFilesystems" value="library,library-nosync,documents,documents-nosync,cache,bundle,root" /> -->
@@ -33,21 +35,21 @@
         <icon density="xhdpi" src="res/icons/android/appli-icon-8.png" />
     </platform>
     <platform name="ios">
-        <icon height="180" src="res/icons/ios/appli-icon-8.png" width="180" />
-        <icon height="60" src="res/icons/ios/appli-icon-8.png" width="60" />
-        <icon height="120" src="res/icons/ios/appli-icon-8.png" width="120" />
-        <icon height="76" src="res/icons/ios/appli-icon-8.png" width="76" />
-        <icon height="152" src="res/icons/ios/appli-icon-8.png" width="152" />
-        <icon height="40" src="res/icons/ios/appli-icon-8.png" width="40" />
-        <icon height="80" src="res/icons/ios/appli-icon-8.png" width="80" />
-        <icon height="57" src="res/icons/ios/appli-icon-8.png" width="57" />
-        <icon height="114" src="res/icons/ios/appli-icon-8.png" width="114" />
-        <icon height="72" src="res/icons/ios/appli-icon-8.png" width="72" />
-        <icon height="144" src="res/icons/ios/appli-icon-8.png" width="144" />
-        <icon height="29" src="res/icons/ios/appli-icon-8.png" width="29" />
-        <icon height="58" src="res/icons/ios/appli-icon-8.png" width="58" />
-        <icon height="50" src="res/icons/ios/appli-icon-8.png" width="50" />
-        <icon height="100" src="res/icons/ios/appli-icon-8.png" width="100" />
+        <icon height="180" src="res/icons/ios/ios-icon.png" width="180" />
+        <icon height="60" src="res/icons/ios/ios-icon.png" width="60" />
+        <icon height="120" src="res/icons/ios/ios-icon.png" width="120" />
+        <icon height="76" src="res/icons/ios/ios-icon.png" width="76" />
+        <icon height="152" src="res/icons/ios/ios-icon.png" width="152" />
+        <icon height="40" src="res/icons/ios/ios-icon.png" width="40" />
+        <icon height="80" src="res/icons/ios/ios-icon.png" width="80" />
+        <icon height="57" src="res/icons/ios/ios-icon.png" width="57" />
+        <icon height="114" src="res/icons/ios/ios-icon.png" width="114" />
+        <icon height="72" src="res/icons/ios/ios-icon.png" width="72" />
+        <icon height="144" src="res/icons/ios/ios-icon.png" width="144" />
+        <icon height="29" src="res/icons/ios/ios-icon.png" width="29" />
+        <icon height="58" src="res/icons/ios/ios-icon.png" width="58" />
+        <icon height="50" src="res/icons/ios/ios-icon.png" width="50" />
+        <icon height="100" src="res/icons/ios/ios-icon.png" width="100" />
     </platform>
     <platform name="windows">
         <icon height="150" src="res/icons/windows/Square150x150Logo.scale-100.png" width="150" />
@@ -77,16 +79,16 @@
         <splash density="port-xhdpi" src="res/screens/android/apptitle.9.png" />
     </platform>
     <platform name="ios">
-        <splash height="480" src="res/screens/ios/appli-title-big-iphone.png" width="320" />
-        <splash height="960" src="res/screens/ios/appli-title-big-iphone.png" width="640" />
-        <splash height="1024" src="res/screens/ios/appli-title-big-iphone.png" width="768" />
-        <splash height="2048" src="res/screens/ios/appli-title-big-iphone.png" width="1536" />
-        <splash height="768" src="res/screens/ios/appli-title-big-iphone.png" width="1024" />
-        <splash height="1536" src="res/screens/ios/appli-title-big-iphone.png" width="2048" />
-        <splash height="1136" src="res/screens/ios/appli-title-big-iphone.png" width="640" />
-        <splash height="1334" src="res/screens/ios/appli-title-big-iphone.png" width="750" />
-        <splash height="2208" src="res/screens/ios/appli-title-big-iphone.png" width="1242" />
-        <splash height="1242" src="res/screens/ios/appli-title-big-iphone.png" width="2208" />
+        <splash src="res/screen/ios/Default@2x.png" width="320" height="480"/>
+        <splash src="res/screen/ios/Default@2x.png" width="640" height="960"/>
+        <splash src="res/screen/ios/Default-Portrait.png" width="768" height="1024"/>
+        <splash src="res/screen/ios/Default-Portrait@2x.png" width="1536" height="2048"/>
+        <splash src="res/screen/ios/Default-Landscape.png" width="1024" height="768"/>
+        <splash src="res/screen/ios/Default-Landscape@2x.png" width="2048" height="1536"/>
+        <splash src="res/screen/ios/Default-568h@2x.png" width="640" height="1136"/>
+        <splash src="res/screen/ios/Default-667h@2x.png" width="750" height="1334"/>
+        <splash src="res/screen/ios/Default-Portrait-736h@3x.png" width="1242" height="2208"/>
+        <splash src="res/screen/ios/Default-Landscape-736h@3x.png" width="2208" height="1242"/>
     </platform>
     <platform name="windows">
         <splash height="300" src="res/screens/windows/SplashScreen.scale-100.png" width="620" />

@@ -68,5 +68,7 @@ function onDeviceReady() {
     /////////////////////////////////// 一覧表示 ////////////////////////////////////
     var page = path.parse(location.href).base.split(".")[0];
     view[page].init();
+
+    window.navigator.splashscreen.hide();
   });
 };
