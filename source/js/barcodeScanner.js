@@ -21,10 +21,6 @@ module.exports = {
           return;
         }
 
-        // if (result.format !== "QR_CODE") {
-        //   $("#qrcode-error").data("barcodes", barcodes).openModal();
-        //   return;
-        // }
         barcodes.push(result.text.trim());
         // 分割されているかどうか
         $("#camera-continue").data("barcodes", barcodes).openModal();
@@ -50,15 +46,22 @@ module.exports = {
         return _(barcode.split("\n")).map(function(row) { return self.csvToArray(row) });
       });
 
-      var barcode = this.arrangeBarcodes(barcodes);
+      var disps = this.arrangeBarcodes(barcodes);
 
-      console.log(barcode);
-
+      var records = [];
       try {
-      this.save(barcode, callback);
+        _(disps).each(function(disp) {
+          records = records.concat(self.save(disp));
+        });
       } catch (e) {
+        _(records).each(function(record) {
+          persistence.remove(record);
+        });
+        console.error(e);
         throw "データを解析できなかったよ。";
       }
+
+      persistence.flush(callback);
     } catch (e) {
       console.error(e);
       Materialize.toast(e + "ごめん...", 4000);
@@ -70,81 +73,93 @@ module.exports = {
     var definition = my.init.definition;
     var schemas = my.init.schemas;
 
-    var barcode = _(barcodes).reduce(function(memo, code) { return memo.concat(code) }, []);
+    var csv = _(barcodes).flatten(true);
 
-    if (!barcode[0]
-      || !barcode[0][0]
-      || !barcode[0][0].startsWith("JAHISTC")) {
+    if (!csv[0]
+      || !csv[0][0]
+      || !csv[0][0].startsWith("JAHISTC")) {
       throw "CSVの形式が違うよ。";
     }
-    // バージョン情報のためのダミー番号
-    barcode[0].unshift(definition.schema("QRcodeVersion").no.toString());
 
-    // 調剤明細全体スキーマのためのダミー番号
-    barcode.unshift([definition.schema("Dispensing").no.toString(), moment()]);
+    var headIndices = _(csv).map(function(val, index) {
+      return val && val[0] && val[0].startsWith("JAHISTC") ? index : null;
+    }).filter(_.isNumber);
 
-    try {
-      // RP情報の起点となるレコードが無いため（クソ・オブ・クソ）
-      // 起点となるダミーレコードを挿入する
-      var dispDateIndices = _.chain(barcode).map(function(row, index) {
-        return parseInt(row[0]) === definition.schema("DispDate").no ? index : null;
-      }).filter(function(index) {
-        return _.isNumber(index);
-      }).value();
-
-      dispDateIndices.reverse();
-
-      // No.5 のレコードで切って
-      _(dispDateIndices).each(function(index, i) {
-        var codes = barcode.slice(index, dispDateIndices[i - 1]);
-        var originalLength = codes.length;
-
-        // RP情報の要素レコードからRP番号の一覧を作る
-        var rpNos = _.chain(codes).filter(function(row) {
-          var no = definition.schema("RPInfo").childrenNo;
-          return _(no).contains(parseInt(row[0]));
-        }).map(_.property(1))
-        .uniq()
-        .value();
-
-        rpNos.reverse();
-
-        // 後ろからRP情報用のダミーレコードをつっこんでいく
-        // そうすればindexがずれないでしょ？
-        _.chain(rpNos).each(function(rpNo) {
-          var rpIndex = _(codes).findIndex(function(row) { return row[1] === rpNo });
-          codes.splice(rpIndex, 0, [definition.schema("RPInfo").no.toString(), rpNo.toString()]);
-        });
-
-        // 処方－医師情報が無ければ、ダミーレコードをつっこむ
-        // （親子関係を維持する気がないデータ構造すごい（すごい））
-        if (!_(codes).find(function(row) {
-          return parseInt(row[0]) === definition.schema("PrescriptionDoctor").no;
-        })) {
-          var medicineIndex = _(codes).findIndex(function(row) {
-            return parseInt(row[0]) === definition.schema("RPInfo").no;
-          });
-          codes.splice(medicineIndex, 0, [definition.schema("PrescriptionDoctor").no.toString()]);
-        }
-
-        // 可変長引数に配列を渡すためapplyを使う
-        barcode.splice.apply(barcode, [index, originalLength].concat(codes));
-      });
-    } catch (e) {
-      throw "読み取ったデータを初期化できなかったよ。"
+    var disps = [];
+    for (var i = 0; i < headIndices.length; i++) {
+      disps.push(csv.slice(headIndices[i], headIndices[i + 1]));
     }
 
-    return barcode;
+    return _(disps).map(function(barcode) {
+      // バージョン情報のためのダミー番号
+      barcode[0].unshift(definition.schema("QRcodeVersion").no.toString());
+
+      // 調剤明細全体スキーマのためのダミー番号
+      barcode.unshift([definition.schema("Dispensing").no.toString(), moment()]);
+
+      try {
+        // RP情報の起点となるレコードが無いため（クソ・オブ・クソ）
+        // 起点となるダミーレコードを挿入する
+        var dispDateIndices = _.chain(barcode).map(function(row, index) {
+          return parseInt(row[0]) === definition.schema("DispDate").no ? index : null;
+        }).filter(function(index) {
+          return _.isNumber(index);
+        }).value();
+
+        dispDateIndices.reverse();
+
+        // No.5 のレコードで切って
+        _(dispDateIndices).each(function(index, i) {
+          var codes = barcode.slice(index, dispDateIndices[i - 1]);
+          var originalLength = codes.length;
+
+          // RP情報の要素レコードからRP番号の一覧を作る
+          var rpNos = _.chain(codes).filter(function(row) {
+            var no = definition.schema("RPInfo").childrenNo;
+            return _(no).contains(parseInt(row[0]));
+          }).map(_.property(1))
+          .uniq()
+          .value();
+
+          rpNos.reverse();
+
+          // 後ろからRP情報用のダミーレコードをつっこんでいく
+          // そうすればindexがずれないでしょ？
+          _.chain(rpNos).each(function(rpNo) {
+            var rpIndex = _(codes).findIndex(function(row) { return row[1] === rpNo });
+            codes.splice(rpIndex, 0, [definition.schema("RPInfo").no.toString(), rpNo.toString()]);
+          });
+
+          // 処方－医師情報が無ければ、ダミーレコードをつっこむ
+          // （親子関係を維持する気がないデータ構造すごい（すごい））
+          if (!_(codes).find(function(row) {
+            return parseInt(row[0]) === definition.schema("PrescriptionDoctor").no;
+          })) {
+            var medicineIndex = _(codes).findIndex(function(row) {
+              return parseInt(row[0]) === definition.schema("RPInfo").no;
+            });
+            codes.splice(medicineIndex, 0, [definition.schema("PrescriptionDoctor").no.toString()]);
+          }
+
+          // 可変長引数に配列を渡すためapplyを使う
+          barcode.splice.apply(barcode, [index, originalLength].concat(codes));
+        });
+      } catch (e) {
+        throw "読み取ったデータを初期化できなかったよ。"
+      }
+
+      return barcode;
+    });
   },
 
   // DBに保存する。
-  save: function(barcode, callback) {
+  save: function(barcode) {
     var definition = my.init.definition;
     var schemas = my.init.schemas;
 
     // 先祖マップ
     var parents = {};
-    _.chain(barcode).filter(function(row) {
+    return _.chain(barcode).filter(function(row) {
       return definition.schema(parseInt(row[0]));
     }).each(function(row) {
       var no = parseInt(row[0]);
@@ -180,9 +195,11 @@ module.exports = {
           parentRecord[schemaDef.foreignName] = record;
         }
       }
-    });
 
-    persistence.flush(callback);
+      return record;
+    }).value();
+
+    //persistence.flush(callback);
   },
 
   // http://stackoverflow.com/questions/8493195/how-can-i-parse-a-csv-string-with-javascript-which-contains-comma-in-data

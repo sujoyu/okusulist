@@ -12,6 +12,7 @@ module.exports = {
     var self = this;
 
     $('.modal-trigger').leanModal();
+    Materialize.updateTextFields();
 
     $("#export").click(function() {
       my.init.schemas.Dispensing.all().list(function(disps) {
@@ -35,7 +36,6 @@ module.exports = {
       my.fileSystem.openChooser(false, "インポートするファイルを選んでね。", function(url) {
         my.fileSystem.load(url).then(function(result) {
           my.barcodeScanner.saveRecord([result], function() {
-            self.init();
             Materialize.toast('処方箋を追加したよ。', 4000);
           });
         });
@@ -51,6 +51,19 @@ module.exports = {
         Materialize.toast("データベースを初期化したよ。", 4000)
       });
     });
+
+    $("#create-csv").click(function() {
+      window.open($(this).attr("href"), '_system');
+      return false;
+    });
+
+    $("#import-csv .import").click(function() {
+      my.barcodeScanner.saveRecord([$("#import-csv_text").val()], function() {
+        $("#import-csv_text").val("").trigger('autoresize');
+        Materialize.updateTextFields();
+        Materialize.toast('処方箋を追加したよ。', 4000);
+      });
+    })
   },
 
   generateCsv: function(disp) {

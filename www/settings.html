@@ -23,9 +23,32 @@
   </nav>
 
   <div class="collection" id="setting-list">
-    <a href="#!" class="collection-item" id="import"><i class="material-icons circle cyan white-text">&#xE2C4;</i>インポート</a>
-    <a href="#!" class="collection-item" id="export"><i class="material-icons circle cyan white-text">&#xE2C6;</i>エクスポート</a>
-    <a href="#db-clear-confirm" class="collection-item modal-trigger"><i class="material-icons circle cyan white-text">delete</i>データベースのクリア</a>
+    <a href="#!" class="collection-item avatar" id="import">
+      <i class="material-icons circle cyan white-text">&#xE2C4;</i>
+      <span class="title cyan-text">インポート</span>
+      <p class="blue-grey-text text-lighten-3">ファイルから処方箋を取り込むよ。</p>
+    </a>
+    <a href="#!" class="collection-item avatar" id="export">
+      <i class="material-icons circle cyan white-text">&#xE2C6;</i>
+      <span class="title cyan-text">エクスポート</span>
+      <p class="blue-grey-text text-lighten-3">ファイルに処方箋を出力するよ。</p>
+    </a>
+    <a href="http://lifecloud.sfc.keio.ac.jp/mykarte/okusuri/prescription4QR/" class="collection-item avatar" id="create-csv">
+      <i class="material-icons circle cyan white-text">&#xE89D;</i>
+      <span class="title cyan-text">処方データの手動作成</span>
+      <p class="blue-grey-text text-lighten-3">データを作成する外部サイトを開くよ。
+      作成したCSVデータをコピーして、下の「CSVテキストデータの取り込み」に入力してね。</p>
+    </a>
+    <a href="#import-csv" class="collection-item avatar modal-trigger">
+      <i class="material-icons circle cyan white-text">code</i>
+      <span class="title cyan-text">CSVテキストデータの取り込み</span>
+      <p class="blue-grey-text text-lighten-3">CSVテキストデータの処方箋を取り込むよ。</p>
+    </a>
+    <a href="#db-clear-confirm" class="collection-item avatar modal-trigger">
+      <i class="material-icons circle cyan white-text">delete</i>
+      <span class="title cyan-text">データベースのクリア</span>
+      <p class="blue-grey-text text-lighten-3">データベースのすべてのデータを削除するよ。（「あなたについて」の情報を除く）</p>
+    </a>
   </div>
 
   <div id="file-chooser" class="modal modal-fixed-footer">
@@ -39,6 +62,23 @@
     </div>
     <div class="modal-footer">
       <a href="#!" class="teal-text waves-effect waves-green btn-flat choose">決めた</a>
+      <a href="#!" class="blue-grey-text darken-3 modal-action modal-close waves-effect btn-flat">やめた</a>
+    </div>
+  </div>
+
+  <div id="import-csv" class="modal">
+    <div class="modal-content">
+      <h4 class="center-align teal-text"><i class="medium material-icons">code</i></h4>
+      <p class="">処方箋のCSVテキストデータを入力してね。</p>
+      <form>
+        <div class="input-field">
+          <textarea id="import-csv_text" type="text" class="materialize-textarea"></textarea>
+          <label for="import-csv_text">CSVデータ</label>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <a href="#!" class="teal-text modal-action modal-close waves-effect waves-green btn-flat import">取り込む</a>
       <a href="#!" class="blue-grey-text darken-3 modal-action modal-close waves-effect btn-flat">やめた</a>
     </div>
   </div>
