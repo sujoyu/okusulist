@@ -21,11 +21,10 @@ module.exports = {
           return;
         }
 
-        if (result.format !== "QR_CODE") {
-          $("#qrcode-error").data("barcodes", barcodes).openModal();
-          return;
-        }
-
+        // if (result.format !== "QR_CODE") {
+        //   $("#qrcode-error").data("barcodes", barcodes).openModal();
+        //   return;
+        // }
         barcodes.push(result.text.trim());
         // 分割されているかどうか
         $("#camera-continue").data("barcodes", barcodes).openModal();
@@ -34,18 +33,11 @@ module.exports = {
       function(error) {
         console.error(error);
         Materialize.toast('ふぇぇ、エラーだよ...ごめんなさい...', 4000);
-//        swal({
-//          title: "エラー",
-//          text: "ふぇ、エラーだよ...ごめんなさい...",
-//          type: "error",
-//          showCancelButton: true,
-//          confirmButtonText: "仕方がないな",
-//          cancelButtonText: "ゆるさん！"
-//        }).then(function (isConfirm) {
-//          if (!isConfirm) {
-//            // エラー情報を送信する
-//          }
-//        });
+      },
+      {
+          "prompt" : "スキャン範囲にQRコードを写してね。", // supported on Android only
+          "formats" : "QR_CODE", // default: all but PDF_417 and RSS_EXPANDED
+          "orientation" : "landscape",
       }
     );
   },

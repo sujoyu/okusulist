@@ -25,8 +25,8 @@ var view = {
 
 var fileSystem = require("./fileSystem");
 
-var isTesting = false;
-// isTesting = true;
+// var isTesting = false;
+//  isTesting = true;
 
 if(typeof device === 'undefined'){
   $(document).on("deviceready", onDeviceReady);
@@ -44,9 +44,9 @@ function onDeviceReady() {
       };
     }
 
-    if (isTesting) {
-      testing.prepare();
-    }
+    // if (isTesting) {
+    //   testing.prepare();
+    // }
 
     schemas.init();
     user.init();

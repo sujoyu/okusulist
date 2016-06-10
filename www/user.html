@@ -24,42 +24,46 @@
 
   <form id="user-form" action="#!">
     <div class="row">
-      <div class="input-field col s12">
-        <input id="birth" type="text">
+      <div class="input-field col s6">
+        <input id="birth" type="text" maxlength="10">
         <label for="birth">生年月日</label>
       </div>
+      <div class="input-field col s6">
+          <input disabled value="" type="text" class="validate" id="patient-age">
+          <label for="patient-age">年齢</label>
+        </div>
     </div>
     <div class="row">
       <div class="input-field col s6">
-        <input placeholder="山田" id="last_name" type="text">
+        <input placeholder="山田" id="last_name" type="text" maxlength="10">
         <label for="last_name">姓</label>
       </div>
       <div class="input-field col s6">
-        <input placeholder="花子" id="first_name" type="text">
+        <input placeholder="花子" id="first_name" type="text" maxlength="10">
         <label for="first_name">名</label>
       </div>
     </div>
     <div class="row">
       <div class="input-field col s12">
-        <input placeholder="090-000-0000" id="contact" type="text">
+        <input placeholder="090-000-0000" id="contact" type="text" maxlength="400">
         <label for="contact">連絡先</label>
       </div>
     </div>
     <div class="row">
       <div class="input-field col s12">
-        <textarea placeholder="お薬の名前、食べ物など" id="historyOfAllergy" class="materialize-textarea"></textarea>
+        <textarea placeholder="お薬の名前、食べ物など" id="historyOfAllergy" class="materialize-textarea" length="60" maxlength="60"></textarea>
         <label for="historyOfAllergy">アレルギー歴</label>
       </div>
     </div>
     <div class="row">
       <div class="input-field col s12">
-        <textarea placeholder="お薬の名前" id="historyOfSideEffect" class="materialize-textarea"></textarea>
+        <textarea placeholder="お薬の名前" id="historyOfSideEffect" class="materialize-textarea" length="60" maxlength="60"></textarea>
         <label for="historyOfSideEffect">副作用歴</label>
       </div>
     </div>
     <div class="row">
       <div class="input-field col s12">
-        <textarea id="medicalHistory" class="materialize-textarea"></textarea>
+        <textarea id="medicalHistory" class="materialize-textarea" length="60" maxlength="60"></textarea>
         <label for="historyOfAllergy">主な既往歴</label>
       </div>
     </div>

@@ -63,12 +63,16 @@
   <div class="clear">
   <ul id="techo" class="collapsible hide" data-collapsible="expandable">
     <li id="template" class="hide techo-section">
-      <div class="collapsible-header waves-effect waves-light-purple">
+      <div class="collapsible-header">
         <i class="material-icons cyan-text accent-icon">&#xE89C;</i>
         <span class="header-text"></span>
-        <a class="modal-trigger right delete" href="#confirm-delete">
-          <i class="tiny material-icons">delete</i>
+        <a href="#!" class="waves-effect waves-light-purple dropdown-button right techo-submenu-button">
+          <i class="tiny material-icons">&#xE5D4;</i>
         </a>
+        <ul class="dropdown-content techo-submenu">
+          <li><a class="cyan-text modal-trigger edit" href="#edit-comment"><i class="material-icons">edit</i></a></li>
+          <li><a class="cyan-text modal-trigger delete" href="#confirm-delete"><i class="tiny material-icons">delete</i></a></li>
+        </ul>
       </div>
       <div class="collapsible-body blue-grey lighten-5">
         <div class="first-contents-list">
@@ -134,6 +138,23 @@
       </div>
       <div class="modal-footer">
         <a href="#!" class="teal-text modal-action modal-close waves-effect waves-green btn-flat delete">いいよ</a>
+        <a href="#!" class="blue-grey-text darken-3 modal-action modal-close waves-effect btn-flat">やめて</a>
+      </div>
+    </div>
+
+    <div id="edit-comment" class="modal">
+      <div class="modal-content">
+        <h4 class="center-align teal-text"><i class="medium material-icons">edit</i></h4>
+        <p class="">あなたのメモを入力してね。</p>
+        <form>
+          <div class="input-field">
+            <textarea id="edit-comment_patient-comment" type="text" length="200" maxlength="200" class="materialize-textarea"></textarea>
+            <label for="edit-comment_patient-comment">患者等記入情報</label>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="teal-text modal-action modal-close waves-effect waves-green btn-flat save">保存する</a>
         <a href="#!" class="blue-grey-text darken-3 modal-action modal-close waves-effect btn-flat">やめて</a>
       </div>
     </div>

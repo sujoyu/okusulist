@@ -6,3 +6,4 @@
 /plugins
 /www/compiled
 .DS_Store
+android_release.sh

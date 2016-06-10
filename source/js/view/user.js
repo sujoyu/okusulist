@@ -3,6 +3,8 @@ var Materialize = window.Materialize;
 
 module.exports = {
 	init: function() {
+    $('#historyOfAllergy, #historyOfSideEffect, #medicalHistory').characterCounter();
+
 		$("#birth").bootstrapMaterialDatePicker({
       lang: "ja",
       weekStart : 0,
@@ -57,5 +59,16 @@ module.exports = {
 
 			return false;
 		});
+
+    $("#birth").change(function() {
+      var val = $(this).val();
+      if (val) {
+        var duration = moment.duration(moment().diff(new Date(val)));
+        $("#patient-age").val(duration.years() + "歳 " + duration.months() + "ヶ月");
+      } else {
+        $("#patient-age").val("");
+      }
+      Materialize.updateTextFields();
+    })
 	}
 }

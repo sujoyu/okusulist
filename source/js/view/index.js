@@ -72,8 +72,42 @@ module.exports = {
       my.init.schemas[schema].load(id, function(date) {
         persistence.remove(date);
         self.init();
-        Materialize.toast('削除しました。', 4000);
+        Materialize.toast('削除したよ。', 4000);
       });
+    });
+
+    $("#edit-comment").find(".save").click(function() {
+      var id = $(this).data("id");
+      var schema = $(this).data("schema");
+      if (!id) {
+        return;
+      }
+      if (!schema) {
+        schema = "DispDate";
+      }
+
+      $(this).removeData("id").removeData("schema");
+
+      persistence.transaction(function(tx) {
+      my.init.schemas[schema].load(tx, id, function(date) {
+        date.patientComment.one(tx, function(comment) {
+          if (!comment) {
+            comment = new my.init.schemas.PatientComment();
+          }
+          comment.comment = $("#edit-comment_patient-comment").val();
+          date.patientComment.add(comment);
+          persistence.flush(tx, function() {
+            $("#edit-comment_patient-comment").val("")
+              .trigger("autoresize");
+            Materialize.updateTextFields();
+            self.init();
+            Materialize.toast('患者等記入情報を保存したよ。', 4000);
+          });
+        });
+      });
+    });
+
+
     });
     this.doneFirst = true;
   },
@@ -192,6 +226,7 @@ module.exports = {
 
     var definition = my.init.definition;
     var schemas = my.init.schemas;
+    var weh = this.withErrorHandler;
 
     var self = this;
     var $temp = $("#template");
@@ -202,24 +237,6 @@ module.exports = {
     // callback地獄を避けるため
     // next()で次に呼ぶ関数を準備。complete()で実行。
     var funcs = [
-//      function(context, next, complete) {
-//        context.$list = $();
-//
-//        schemas.Dispensing.all()
-//          .list(context.tx, function(disps) {
-//            _(disps).each(function(disp) {
-////              var section = new Section("調剤情報");
-////              context.$list = context.$list.add(section.$obj);
-//
-//              var localContext = _.clone(context);
-//              localContext.parentContext = context;
-//              localContext.disp = disp;
-//
-//              next(localContext);
-//            });
-//            complete();
-//          });
-//      },
       // 調剤日付ごと
       function(context, next, complete) {
         context.$list = $();
@@ -242,13 +259,31 @@ module.exports = {
           .prefetch("dispDoctor")
           .prefetch("prescriptionHospital")
           .list(context.tx, function(dispDates) {
-            var dates =  _(dispDates).map(function(dispDate) {
+            var dates =  _(dispDates).map(weh(function(dispDate) {
               var date = moment(dispDate.date).format("YYYY/MM/DD");
               var section = new Section(date + " : " + dispDate.dispHospital.name, true, dispDate.id)
               // .addDef(dispDate.dispensing.otcMedicine, "OtcMedicine", "name", true)
               .addDef(dispDate.dispDoctor, "DispDoctor", "name", true)
               .addDef(dispDate.prescriptionHospital, "PrescriptionHospital", "name", true)
               .addDef(dispDate.prescriptionHospital, "PrescriptionHospital", "contact", true);
+
+              dispDate.dosingCaution.list(function(cautions) {
+                _(cautions).each(weh(function(caution) {
+                  section.addDef(caution, "DosingCaution", "content", true);
+                }));
+
+                dispDate.note.list(function(notes) {
+                  _(notes).each(weh(function(note) {
+                    section.addDef(note, "Note", "noteInfo", true);
+                  }));
+
+                  dispDate.patientComment.list(function(comments) {
+                    _(comments).each(weh(function(comment) {
+                      section.addDef(comment, "PatientComment", "comment", true);
+                    }));
+                  });
+                });
+              });
 
               return [date, function() {
                 context.$list = context.$list.add(section.$obj);
@@ -259,7 +294,7 @@ module.exports = {
 
                 next(localContext)
               }];
-            });
+            }));
 
             var medQuery;
             if (date) {
@@ -275,7 +310,7 @@ module.exports = {
             }
 
             medQuery.list(context.tx, function(otcs) {
-                var otcDates = _(otcs).map(function(otc) {
+                var otcDates = _(otcs).map(weh(function(otc) {
                   var start = moment(otc.startDate).format("YYYY/MM/DD");
                   var end = moment(otc.endDate).format("YYYY/MM/DD");
                   var parser = function(prop) {
@@ -290,7 +325,7 @@ module.exports = {
                   return [start, function() {
                     context.$list = context.$list.add(section.trim().$obj);
                   }];
-                });
+                }));
 
                 _(_(dates.concat(otcDates)).sortBy(0).reverse()).each(function(date) {
                   date[1]();
@@ -304,7 +339,7 @@ module.exports = {
       function(context, next, complete) {
         context.dispDate.prescriptionDoctor
           .list(context.tx, function(doctors) {
-            _(doctors).each(function(doctor) {
+            _(doctors).each(weh(function(doctor) {
               var text = doctor.name
                 ? "処方医師: " + doctor.name
                 : "処方";
@@ -317,7 +352,7 @@ module.exports = {
               localContext.section = section;
 
               next(localContext);
-            });
+            }));
             context.section.trim();
             complete();
           });
@@ -325,11 +360,23 @@ module.exports = {
       // RP情報
       function(context, next, complete) {
         context.doctor.rPInfo
-        .prefetch("usage")
+          .prefetch("usage")
           .list(context.tx, function(infos) {
-            _(infos).each(function(info) {
+            _(infos).each(weh(function(info) {
               var section = new Section(info.usage.name)
                 .addDef("数量", info.usage.volume + " " + info.usage.unit, true);
+
+              info.usage.usageComplement.list(function(comps) {
+                _(comps).each(function(comp) {
+                  section.addDef(comp, "UsageComplement", "info", true)
+                });
+
+                info.usageCaution.list(function(cautions) {
+                  _(cautions).each(function(caution) {
+                    section.addDef(caution, "UsageCaution", "content", true);
+                  });
+                });
+              });
 
               context.section.addSec(section.$obj);
 
@@ -338,7 +385,7 @@ module.exports = {
               localContext.section = section;
 
               next(localContext);
-            });
+            }));
             context.section.trim();
             complete();
           });
@@ -347,7 +394,7 @@ module.exports = {
       function(context, next, complete) {
         context.rpInfo.medicine
           .list(context.tx, function(medicines) {
-            _(medicines).each(function(medicine) {
+            _(medicines).each(weh(function(medicine) {
               var section = new Section(medicine.name)
                 .addDef("用量", medicine.dose + " " + medicine.unitName);
 
@@ -358,7 +405,7 @@ module.exports = {
               localContext.section = section;
 
               next(localContext);
-            });
+            }));
             context.section.trim();
             complete();
           })
@@ -367,21 +414,22 @@ module.exports = {
       function(context, next, complete) {
         context.medicine.medicineComplement
           .list(context.tx, function(complements) {
-            _(complements).each(function(comp) {
+            _(complements).each(weh(function(comp) {
               context.section.addDef(comp, "MedicineComplement", "info");
-            });
+            }));
+
+            context.medicine.medicineCaution
+             .list(context.tx, function(cautions) {
+               _(cautions).each(weh(function(caution) {
+                 context.section.addDef(caution, "MedicineCaution", "content", true);
+               }));
+             });
+
             context.section.trim();
             complete();
           });
 
-//        context.medicine.medicineCaution
-//          .list(context.tx, function(cautions) {
-//            _(cautionss).each(function(caution) {
-//              context.section.addDef(caution, "MedicineCaution", "content");
-//            });
-//            context.section.trim();
-//            complete();
-//          });
+
       }
     ];
 
@@ -409,16 +457,44 @@ module.exports = {
 
         $techo.append(context.$list);
 
-        $('.collapsible').collapsible();
-        $('.modal-trigger').leanModal();
+        $techo.find('.collapsible').collapsible();
+        $techo.find('.modal-trigger').leanModal();
+        $techo.find('.dropdown-button').dropdown();
 
-        var delButton = $("#confirm-delete").find(".delete");
+        $techo.find(".techo-submenu-button").click(function() {
+          $(this).trigger("open");
+          return false;
+        })
 
-        context.$list.find(".modal-trigger.delete")
+        $techo.find(".modal-trigger.edit")
           .click(function() {
-            var id = $(this).data("id");
-            var schema = $(this).data("schema")
-            delButton.data({
+            var submenu = $(this).parents(".techo-submenu");
+            var id = submenu.data("id");
+            var schema = submenu.data("schema")
+            $("#edit-comment").find(".save").data({
+              id: id,
+              schema: schema
+            });
+            var modal = $($(this).attr("href"));
+
+            schemas.DispDate.load(id, function(date) {
+              date.patientComment.one(function(comment) {
+                $("#edit-comment_patient-comment").val(comment && comment.comment ? comment.comment : "")
+                  .trigger('autoresize');
+                Materialize.updateTextFields();
+                modal.openModal();
+              })
+            })
+
+            return false;
+          });
+
+        $techo.find(".modal-trigger.delete")
+          .click(function() {
+            var submenu = $(this).parents(".techo-submenu");
+            var id = submenu.data("id");
+            var schema = submenu.data("schema")
+            $("#confirm-delete").find(".delete").data({
               id: id,
               schema: schema
             });
@@ -464,17 +540,24 @@ module.exports = {
       return $dt.add($dd);
     }
 
-    function Section(name, isDeletable, id, schema) {
+    function Section(name, isHeader, id, schema) {
       var $obj = $temp.clone(true).removeAttr("id").removeClass("hide");
 
-      if (!isDeletable) {
-        $obj.find(".modal-trigger.delete").detach();
+      if (!isHeader) {
+        $obj.find(".techo-submenu-button").detach();
         $obj.find(".accent-icon").detach();
       } else {
-        $obj.find(".modal-trigger.delete").data({
-          id: id,
-          schema: schema
-        });
+        var submenuId = "techo-submenu-" + id;
+        $obj.find(".techo-submenu-button").attr("data-activates", submenuId);
+        $obj.find(".techo-submenu").attr("id", submenuId)
+          .data({
+            id: id,
+            schema: schema
+          });
+
+        if (schema && schema !== "DispDate") {
+          $obj.find(".techo-submenu .edit").parents("li").detach();
+        }
       }
 
       $obj.find(".collapsible-header").find(".header-text").text(name);
@@ -523,11 +606,11 @@ module.exports = {
   },
 
   // funcsの非同期処理を再帰的に実行、すべて終了したらcallbackを実行する。
-  chain: function(funcs, callback, context) {
+  chain: function(funcs, callback, context, failed) {
     context = context || {};
     recurse(context, 0).then(function() {
       callback(context);
-    });
+    }).catch(failed);
 
     // 再帰用の関数
     function recurse(context, index) {
@@ -540,12 +623,23 @@ module.exports = {
           }, function() {
             // completeが呼ばれたら、同期実行
             // 全部終わったら、このPromiseを終了する
-            Promise.all(promises).then(resolve);
+            Promise.all(promises).then(resolve).catch(reject);
           });
         } else {
           resolve();
         }
       });
+    };
+  },
+
+  withErrorHandler: function(func) {
+    return function() {
+      try {
+        return func.apply(this, arguments);
+      } catch(e) {
+        Materialize.toast("データが壊れてるのか、ちゃんと表示できない処方があるよ...", 4000);
+        console.error(e);
+      }
     };
   },
 
