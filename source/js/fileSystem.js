@@ -22,20 +22,34 @@ module.exports = {
     }
   },
 
-  export: function(path, csvs) {
+  export: function(path, csvs, callback, isSingle) {
     var self = this;
     var dirName = "おくすlist_" + moment().format("YYYY-MM-DD_HH-mm-ss.SSS");
-    _(csvs).each(function(csv) {
-      var uint8array = new Uint8Array(Encoding.convert(csv.code, { to: "SJIS", type: "array" } ));
+
+    if (isSingle) {
+      var code = _(csvs).reduce(function(memo, csv) {
+        return memo + "\r\n" + csv.code
+      }, []).trim();
+
+      var uint8array = new Uint8Array(Encoding.convert(code, { to: "SJIS", type: "array" } ));
       var blob = new Blob([ uint8array ], {
         type: "text/plain",
       });
 
-      self.save(path, dirName, csv.name + "_export.txt", blob);
-    })
+      self.save(path, dirName, "export_all.txt", blob, callback);
+    } else {
+      _(csvs).each(function(csv) {
+        var uint8array = new Uint8Array(Encoding.convert(csv.code, { to: "SJIS", type: "array" } ));
+        var blob = new Blob([ uint8array ], {
+          type: "text/plain",
+        });
+
+        self.save(path, dirName, csv.name + "_export.txt", blob, callback);
+      })
+    }
   },
 
-  save: function(path, dir, name, blob) {
+  save: function(path, dir, name, blob, callback) {
     var self = this;
     window.resolveLocalFileSystemURL(path, function(dirEntry) {
       if (dir) {
@@ -54,12 +68,14 @@ module.exports = {
 
             fileWriter.onwriteend = function(e) {
               console.log('Write completed.');
-              Materialize.toast(decodeURI(fileEntry.toURL()) + " に保存しました。", 4000);
+              callback(true, decodeURI(fileEntry.toURL()), decodeURI(dirEntry.toURL()));
+              //Materialize.toast(decodeURI(fileEntry.toURL()) + " に保存しました。", 4000);
             };
 
             fileWriter.onerror = function(e) {
               console.log('Write failed: ' + e.toString());
-              Materialize.toast(decodeURI(fileEntry.toURL()) + " への保存に失敗しました。", 4000);
+              callback(false, decodeURI(fileEntry.toURL()), decodeURI(dirEntry.toURL()));
+              //Materialize.toast(decodeURI(fileEntry.toURL()) + " への保存に失敗しました。", 4000);
             };
 
             fileWriter.write(blob);
@@ -94,6 +110,20 @@ module.exports = {
     };
 
     console.error('Error: ' + msg);
+  },
+
+  importDir: function(url, callback) {
+    var self = this;
+    this.readFileList(url, function(files) {
+      var promises = _(files).map(function(entry) {
+        if (entry.isFile) {
+          return self.load(entry.toURL());
+        }
+        return Promise.resolve();
+      });
+
+      Promise.all(promises).then(callback);
+    })
   },
 
   load: function(url) {
@@ -244,43 +274,43 @@ module.exports = {
       $fileList.append($fragment);
     }
 
-    if (this.isPc) {
-       var files = [
-      {
-        isDirectory: true,
-         isFile: false,
-         name: "hogeaaaaaaaaaaaaaaaaaa",
-         toURL: function() {
-           return path + "/" + this.name + "/"
-         }
-       },{
-         isDirectory: true,
-         isFile: false,
-         name: "fugaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-         toURL: function() {
-           return path + "/" + this.name + "/"
-         }
-       },{
-         isDirectory: false,
-         isFile: true,
-         name: "piyo",
-         toURL: function() {
-           return path + "/" + this.name
-         }
-       },{
-         isDirectory: false,
-         isFile: true,
-         name: "piyopiyoaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-         toURL: function() {
-           return path + "/" + this.name
-         }
-       },
-     ];
+    // if (this.isPc) {
+    //    var files = [
+    //   {
+    //     isDirectory: true,
+    //      isFile: false,
+    //      name: "hogeaaaaaaaaaaaaaaaaaa",
+    //      toURL: function() {
+    //        return path + "/" + this.name + "/"
+    //      }
+    //    },{
+    //      isDirectory: true,
+    //      isFile: false,
+    //      name: "fugaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    //      toURL: function() {
+    //        return path + "/" + this.name + "/"
+    //      }
+    //    },{
+    //      isDirectory: false,
+    //      isFile: true,
+    //      name: "piyo",
+    //      toURL: function() {
+    //        return path + "/" + this.name
+    //      }
+    //    },{
+    //      isDirectory: false,
+    //      isFile: true,
+    //      name: "piyopiyoaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    //      toURL: function() {
+    //        return path + "/" + this.name
+    //      }
+    //    },
+    //  ];
 
-      refreshFiles(files);
-    } else {
+    //   refreshFiles(files);
+    // } else {
       this.readFileList(path, refreshFiles);
-    }
+    // }
   },
 
   readFileList: function(path, callback) {

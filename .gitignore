@@ -7,3 +7,4 @@
 /www/compiled
 .DS_Store
 android_release.sh
+testdata.txt

@@ -21,12 +21,46 @@ module.exports = {
         })).then(function(csvs) {
           var csvs = _(disps).zip(csvs).map(function(arr) {
             return {
-              name: moment(arr[0].date).format("YYYY-MM-DD_HH-mm-ss.SSS"),
+              name: moment(arr[0].date).format(_.uniqueId("YYYY-MM-DD_")),
               code: arr[1]
             };
           })
           my.fileSystem.openChooser(true, "エクスポートするディレクトリを選んでね。", function(url) {
-            my.fileSystem.export(url, csvs);
+            var count = 0;
+            my.fileSystem.export(url, csvs, function(isSuccess, url, dirUrl) {
+              count++;
+              if (isSuccess) {
+                if (csvs.length === count) {
+                  Materialize.toast(dirUrl + " に保存しました。", 4000);
+                }
+              } else {
+                Materialize.toast(url + " への保存に失敗しました。", 4000);
+              }
+            });
+          });
+        });
+      })
+    });
+
+    $("#export-single").click(function() {
+      my.init.schemas.Dispensing.all().list(function(disps) {
+        Promise.all(_(disps).map(function(disp, index) {
+          return self.generateCsv(disp);
+        })).then(function(csvs) {
+          var csvs = _(disps).zip(csvs).map(function(arr) {
+            return {
+              name: moment(arr[0].date).format(_.uniqueId("YYYY-MM-DD_")),
+              code: arr[1]
+            };
+          })
+          my.fileSystem.openChooser(true, "エクスポートするディレクトリを選んでね。", function(url) {
+            my.fileSystem.export(url, csvs, function(isSuccess, url) {
+              if (isSuccess) {
+                Materialize.toast(url + " に保存しました。", 4000);
+              } else {
+                Materialize.toast(url + " への保存に失敗しました。", 4000);
+              }
+            }, true);
           });
         });
       })
@@ -36,6 +70,16 @@ module.exports = {
       my.fileSystem.openChooser(false, "インポートするファイルを選んでね。", function(url) {
         my.fileSystem.load(url).then(function(result) {
           my.barcodeScanner.saveRecord([result], function() {
+            Materialize.toast('処方箋を追加したよ。', 4000);
+          });
+        });
+      });
+    });
+
+    $("#import-directory").click(function() {
+      my.fileSystem.openChooser(true, "インポートするディレクトリを選んでね。", function(url) {
+        my.fileSystem.importDir(url, function(results) {
+          my.barcodeScanner.saveRecord(results, function() {
             Materialize.toast('処方箋を追加したよ。', 4000);
           });
         });
@@ -53,7 +97,7 @@ module.exports = {
     });
 
     $("#create-csv").click(function() {
-      window.open($(this).attr("href"), '_system');
+      window.cordova.InAppBrowser.open($(this).attr("href"), '_system');
       return false;
     });
 
