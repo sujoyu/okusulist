@@ -3,6 +3,8 @@ var console = window.console;
 
 var pathjs = require("imports?define=>false&this=>window!./../lib/path.js/path.js");
 
+var Promise = require("es6-promise-polyfill").Promise;
+
 module.exports = {
 
   path: null,

@@ -7,6 +7,8 @@ var my = {
   barcodeScanner: require("./../barcodeScanner")
 }
 
+var Promise = require("es6-promise-polyfill").Promise;
+
 module.exports = {
   init: function() {
     var self = this;
