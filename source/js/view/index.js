@@ -210,6 +210,10 @@ module.exports = {
 
   jump: function(params) {
     var url = "index.html";
+    location.href = this.buildUrl(url, params);
+  },
+
+  buildUrl: function(url, params) {
     var query = _(params).map(function(val, key) {
       return encodeURIComponent(key) + "=" + encodeURIComponent(val);
     }).join("&");
@@ -218,7 +222,7 @@ module.exports = {
       url = url + "?" + query;
     }
 
-    location.href = url;
+    return url;
   },
 
   showList: function(date) {
@@ -261,7 +265,7 @@ module.exports = {
           .list(context.tx, function(dispDates) {
             var dates =  _(dispDates).map(weh(function(dispDate) {
               var date = moment(dispDate.date).format("YYYY/MM/DD");
-              var section = new Section(date + " : " + dispDate.dispHospital.name, true, dispDate.id)
+              var section = new Section(date + " : " + dispDate.dispHospital.name, "header", dispDate.id)
               // .addDef(dispDate.dispensing.otcMedicine, "OtcMedicine", "name", true)
               .addDef(dispDate.dispDoctor, "DispDoctor", "name", true)
               .addDef(dispDate.prescriptionHospital, "PrescriptionHospital", "name", true)
@@ -395,7 +399,7 @@ module.exports = {
         context.rpInfo.medicine
           .list(context.tx, function(medicines) {
             _(medicines).each(weh(function(medicine) {
-              var section = new Section(medicine.name)
+              var section = new Section(medicine.name, "medicine", medicine.id, null, { medicineName: medicine.name })
                 .addDef("用量", medicine.dose + " " + medicine.unitName);
 
               context.section.addSec(section.$obj.addClass("small"));
@@ -464,7 +468,7 @@ module.exports = {
         $techo.find(".techo-submenu-button").click(function() {
           $(this).trigger("open");
           return false;
-        })
+        });
 
         $techo.find(".modal-trigger.edit")
           .click(function() {
@@ -501,6 +505,25 @@ module.exports = {
             $($(this).attr("href")).openModal();
             return false;
           });
+
+        $techo.find(".techo-okusuri-button").click(function() {
+          $(this).trigger("open");
+          return false;
+        });
+
+        $techo.find(".techo-okusuri-submenu .search").click(function() {
+          var $this = $(this);
+          var url = $this.attr("href");
+          var query = $this.data("query") || {};
+          var searchQuery = $this.data("searchQuery");
+          var name = $this.data("name");
+
+          query[searchQuery] = Encoding.toHankakuCase(name);
+          console.log(query);
+
+          window.cordova.InAppBrowser.open(self.buildUrl(url, query), '_system');
+          return false;
+        });
 
         my.user.isEmpty(function(empty) {
           if (empty) {
@@ -540,25 +563,41 @@ module.exports = {
       return $dt.add($dd);
     }
 
-    function Section(name, isHeader, id, schema) {
+    function Section(name, type, id, schema, option) {
       var $obj = $temp.clone(true).removeAttr("id").removeClass("hide");
 
-      if (!isHeader) {
-        $obj.find(".techo-submenu-button").detach();
-        $obj.find(".accent-icon").detach();
-      } else {
-        var submenuId = "techo-submenu-" + id;
-        $obj.find(".techo-submenu-button").attr("data-activates", submenuId);
-        $obj.find(".techo-submenu").attr("id", submenuId)
-          .data({
-            id: id,
-            schema: schema
-          });
+      var init = {
+        header: function() {
+          $obj.find(".techo-submenu-button").removeClass("hide");
+          $obj.find(".accent-icon").removeClass("hide");
 
-        if (schema && schema !== "DispDate") {
-          $obj.find(".techo-submenu .edit").parents("li").detach();
+          var submenuId = "techo-submenu-" + id;
+          $obj.find(".techo-submenu-button").attr("data-activates", submenuId);
+          $obj.find(".techo-submenu").attr("id", submenuId)
+            .data({
+              id: id,
+              schema: schema
+            });
+
+          if (schema && schema !== "DispDate") {
+            $obj.find(".techo-submenu .edit").parents("li").detach();
+          }
+        },
+        medicine: function() {
+          var submenuId = "techo-okusuri-submenu-" + id;
+          $obj.find(".techo-okusuri-button")
+            .removeClass("hide")
+            .attr("data-activates", submenuId);
+          $obj.find(".techo-okusuri-submenu")
+            .attr("id", submenuId)
+            .find(".search")
+            .data("name", option.medicineName);
+        },
+        default: function() {
         }
-      }
+      };
+
+      init[type || "default"]();
 
       $obj.find(".collapsible-header").find(".header-text").text(name);
 

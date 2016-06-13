@@ -111,6 +111,11 @@
   float: none;
 }
 
+.techo-okusuri-button .material-icons {
+  margin-right: 0;
+  color: #eceff1;
+}
+
 #file-chooser .breadcrumb {
   color: #263238;
   font-size: 12px;

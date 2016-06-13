@@ -64,14 +64,21 @@
   <ul id="techo" class="collapsible hide" data-collapsible="expandable">
     <li id="template" class="hide techo-section">
       <div class="collapsible-header">
-        <i class="material-icons cyan-text accent-icon">&#xE89C;</i>
+        <i class="material-icons cyan-text accent-icon hide">&#xE89C;</i>
         <span class="header-text"></span>
-        <a href="#!" class="waves-effect waves-light-purple dropdown-button right techo-submenu-button">
+        <a href="#!" class="waves-effect waves-light-purple dropdown-button right techo-submenu-button hide">
           <i class="tiny material-icons">&#xE5D4;</i>
         </a>
         <ul class="dropdown-content techo-submenu">
           <li><a class="cyan-text modal-trigger edit" href="#edit-comment"><i class="material-icons">edit</i></a></li>
-          <li><a class="cyan-text modal-trigger delete" href="#confirm-delete"><i class="tiny material-icons">delete</i></a></li>
+          <li><a class="cyan-text modal-trigger delete" href="#confirm-delete"><i class="material-icons">delete</i></a></li>
+        </ul>
+        <a href="#!" class="waves-effect waves-light-purple dropdown-button right techo-okusuri-button hide">
+          <i class="tiny material-icons">&#xE5D4;</i>
+        </a>
+        <ul class="dropdown-content techo-okusuri-submenu">
+          <li><a class="cyan-text search" href="http://www.rad-ar.or.jp/siori/kensaku.cgi" data-search-query="q_word" data-query='{ "mode": "key", "searchTarget": 1 }'>薬の栞</a></li>
+          <li><a class="cyan-text search" href="https://www.google.co.jp/search" data-search-query="q">Google</a></li>
         </ul>
       </div>
       <div class="collapsible-body blue-grey lighten-5">
