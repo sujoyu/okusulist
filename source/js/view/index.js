@@ -471,6 +471,7 @@ module.exports = {
 
         $techo.find(".techo-submenu-button").click(function() {
           $(this).trigger("open");
+
           return false;
         });
 
@@ -493,8 +494,6 @@ module.exports = {
                 modal.openModal();
               })
             })
-
-            return false;
           });
 
         $techo.find(".modal-trigger.delete")
@@ -507,7 +506,6 @@ module.exports = {
               schema: schema
             });
             $($(this).attr("href")).openModal();
-            return false;
           });
 
         $techo.find(".modal-trigger.qrcode").click(function() {
@@ -515,16 +513,24 @@ module.exports = {
           var id = submenu.data("id");
           var schema = submenu.data("schema") || "DispDate";
 
+          function getPos(str, m, i) {
+            return str.split(m, i).join(m).length;
+          }
+
           schemas[schema].load(id, function(entity) {
             entity.fetch("dispensing", function(disp) {
               dataFormat.generateCsv(disp).then(function(csv) {
-                $("#qrcode-content").empty();
-                new QRCode($("#qrcode-content")[0], csv);
+                var n = "\n";
+                var $content = $("#qrcode-content").empty();
+                _(_.range(0, csv.split(n).length, 10)).each(function(i) {
+                  var last = getPos(csv, n, i + 10);
+                  var partial = csv.substring(getPos(csv, n, i), last > csv.length ? csv.length : last);
+                  var $tmp = $("<div></div>").appendTo($content);
+                  new QRCode($tmp[0], partial);
+                })
               });
             });
           });
-
-          return false;
         });
 
         $techo.find(".techo-okusuri-button").click(function() {
@@ -542,7 +548,6 @@ module.exports = {
           query[searchQuery] = Encoding.toHankakuCase(name);
 
           window.cordova.InAppBrowser.open(self.buildUrl(url, query), '_system');
-          return false;
         });
 
         my.user.isEmpty(function(empty) {
