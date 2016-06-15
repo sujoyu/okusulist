@@ -498,6 +498,7 @@ module.exports = {
 
         $techo.find(".modal-trigger.delete")
           .click(function() {
+            e.preventDefault();
             var submenu = $(this).parents(".techo-submenu");
             var id = submenu.data("id");
             var schema = submenu.data("schema")
@@ -538,7 +539,8 @@ module.exports = {
           return false;
         });
 
-        $techo.find(".techo-okusuri-submenu .search").click(function() {
+        $techo.find(".techo-okusuri-submenu .search").click(function(e) {
+          e.preventDefault();
           var $this = $(this);
           var url = $this.attr("href");
           var query = $this.data("query") || {};
