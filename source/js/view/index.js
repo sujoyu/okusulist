@@ -240,8 +240,6 @@ module.exports = {
     var $temp = $("#template");
     var $techo = $("#techo");
 
-    $techo.empty().append($temp)
-
     // callback地獄を避けるため
     // next()で次に呼ぶ関数を準備。complete()で実行。
     var funcs = [
@@ -462,6 +460,8 @@ module.exports = {
         }
 
         self.updateEnableDates();
+
+        $techo.empty().append($temp);
 
         $techo.append(context.$list);
 

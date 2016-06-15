@@ -69,6 +69,7 @@ module.exports = {
     function parse(obj) {
       innerPromise = innerPromise.then(function() {
       	proc(def, schema, obj);
+      	return Promise.resolve();
       });
 
       _(def.children).each(function(childDef) {
@@ -293,7 +294,11 @@ module.exports = {
 			entities.push(obj);
 		}).then(function() {
 			_(entities).each(function(entity) {
-				persistence.remove(entity);
+				try{
+					persistence.remove(entity);
+				} catch(e) {
+					// プロパティをフェッチしてないとなぜかエラーが出る(iOS)
+				}
 			});
 			return Promise.resolve();
 		});
