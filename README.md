@@ -7,6 +7,8 @@ Android, iOSで動作確認していますが、Appleの開発者登録料が高
 
 実装速度優先でリファクタリングしてないのでお察し。
 
+ダウンロードはこちら https://github.com/sujoyu/okusulist/releases
+
 ## 機能
 
 https://yakutai.ddc.co.jp/okusuri-techo-contents.html
