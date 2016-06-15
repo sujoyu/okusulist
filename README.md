@@ -28,6 +28,7 @@ https://yakutai.ddc.co.jp/okusuri-techo-contents.html
 - スキンでデザインを変える（萌えスキンを作りたい）
 
 ### 優先度低
+- OTC医薬品の詳細検索
 - 薬品名による検索
 - 複数アカウント
 - リファクタリング
