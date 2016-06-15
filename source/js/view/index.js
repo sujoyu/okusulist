@@ -497,7 +497,7 @@ module.exports = {
           });
 
         $techo.find(".modal-trigger.delete")
-          .click(function() {
+          .click(function(e) {
             e.preventDefault();
             var submenu = $(this).parents(".techo-submenu");
             var id = submenu.data("id");
@@ -509,7 +509,8 @@ module.exports = {
             $($(this).attr("href")).openModal();
           });
 
-        $techo.find(".modal-trigger.qrcode").click(function() {
+        $techo.find(".modal-trigger.qrcode").click(function(e) {
+          e.preventDefault();
           var submenu = $(this).parents(".techo-submenu");
           var id = submenu.data("id");
           var schema = submenu.data("schema") || "DispDate";
