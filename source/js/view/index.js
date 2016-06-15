@@ -8,8 +8,9 @@ var my = {
   user: require("./../user"),
 }
 
+var dataFormat = require("./../dataFormat");
+var QRCode = require("qrcode.js");
 var Promise = require("es6-promise-polyfill").Promise;
-
 var Materialize = window.Materialize;
 
 module.exports = {
@@ -23,7 +24,7 @@ module.exports = {
     var $cameraContinue = $("#camera-continue");
     $cameraContinue.find(".complete").click(function() {
       var barcodes = $cameraContinue.data("barcodes");
-      my.barcodeScanner.saveRecord(barcodes, function() {
+      dataFormat.saveRecord(barcodes, function() {
         self.init();
         Materialize.toast('処方箋を追加したよ。', 4000);
       });
@@ -42,7 +43,7 @@ module.exports = {
     var $saveQrcode = $("#save-qrcode")
     $saveQrcode.find(".save").click(function() {
       var barcodes = $saveQrcode.data("barcodes");
-      my.barcodeScanner.saveRecord(barcodes, function() {
+      dataFormat.saveRecord(barcodes, function() {
         self.init();
         Materialize.toast('処方箋を追加しました。', 4000);
       });
@@ -89,26 +90,25 @@ module.exports = {
       $(this).removeData("id").removeData("schema");
 
       persistence.transaction(function(tx) {
-      my.init.schemas[schema].load(tx, id, function(date) {
-        date.patientComment.one(tx, function(comment) {
-          if (!comment) {
-            comment = new my.init.schemas.PatientComment();
-          }
-          comment.comment = $("#edit-comment_patient-comment").val();
-          date.patientComment.add(comment);
-          persistence.flush(tx, function() {
-            $("#edit-comment_patient-comment").val("")
-              .trigger("autoresize");
-            Materialize.updateTextFields();
-            self.init();
-            Materialize.toast('患者等記入情報を保存したよ。', 4000);
+        my.init.schemas[schema].load(tx, id, function(date) {
+          date.patientComment.one(tx, function(comment) {
+            if (!comment) {
+              comment = new my.init.schemas.PatientComment();
+            }
+            comment.comment = $("#edit-comment_patient-comment").val();
+            date.patientComment.add(comment);
+            persistence.flush(tx, function() {
+              $("#edit-comment_patient-comment").val("")
+                .trigger("autoresize");
+              Materialize.updateTextFields();
+              self.init();
+              Materialize.toast('患者等記入情報を保存したよ。', 4000);
+            });
           });
         });
       });
     });
 
-
-    });
     this.doneFirst = true;
   },
 
@@ -506,6 +506,23 @@ module.exports = {
             return false;
           });
 
+        $techo.find(".modal-trigger.qrcode").click(function() {
+          var submenu = $(this).parents(".techo-submenu");
+          var id = submenu.data("id");
+          var schema = submenu.data("schema") || "DispDate";
+
+          schemas[schema].load(id, function(entity) {
+            entity.fetch("dispensing", function(disp) {
+              dataFormat.generateCsv(disp).then(function(csv) {
+                $("#qrcode-content").empty();
+                new QRCode($("#qrcode-content")[0], csv);
+              });
+            });
+          });
+
+          return false;
+        });
+
         $techo.find(".techo-okusuri-button").click(function() {
           $(this).trigger("open");
           return false;
@@ -519,7 +536,6 @@ module.exports = {
           var name = $this.data("name");
 
           query[searchQuery] = Encoding.toHankakuCase(name);
-          console.log(query);
 
           window.cordova.InAppBrowser.open(self.buildUrl(url, query), '_system');
           return false;

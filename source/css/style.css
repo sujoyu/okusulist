@@ -105,7 +105,9 @@
   color: #eceff1;
 }
 
-.techo-submenu .material-icons {
+.techo-submenu .material-icons,
+.techo-submenu .qrcode-icon {
+  display: block;
   margin-left: auto;
   margin-right: auto;
   float: none;
@@ -158,4 +160,9 @@
 #user-form {
   padding-top: 2rem;
   padding-bottom: 3rem;
+}
+
+#qrcode-content img {
+  margin-left: auto;
+  margin-right: auto;
 }

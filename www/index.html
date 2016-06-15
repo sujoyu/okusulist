@@ -71,6 +71,7 @@
         </a>
         <ul class="dropdown-content techo-submenu">
           <li><a class="cyan-text modal-trigger edit" href="#edit-comment"><i class="material-icons">edit</i></a></li>
+          <li><a class="cyan-text modal-trigger qrcode" href="#generate-qrcode"><img class="qrcode-icon" src="images/QRcode.gif"></a></li>
           <li><a class="cyan-text modal-trigger delete" href="#confirm-delete"><i class="material-icons">delete</i></a></li>
         </ul>
         <a href="#!" class="waves-effect waves-light-purple dropdown-button right techo-okusuri-button hide">
@@ -163,6 +164,16 @@
       <div class="modal-footer">
         <a href="#!" class="teal-text modal-action modal-close waves-effect waves-green btn-flat save">保存する</a>
         <a href="#!" class="blue-grey-text darken-3 modal-action modal-close waves-effect btn-flat">やめた</a>
+      </div>
+    </div>
+
+    <div id="generate-qrcode" class="modal">
+      <div class="modal-content">
+        <h4 class="center-align teal-text">QRコード</h4>
+        <div id="qrcode-content"></div>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="teal-text modal-action modal-close waves-effect waves-green btn-flat">閉じる</a>
       </div>
     </div>
 
