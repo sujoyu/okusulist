@@ -14,72 +14,76 @@ module.exports = {
 
     var csv = "";
 
-    return fetchChildren(definition.schema("Dispensing"), disp, true).then(function() {
+    return this.fetchChildren(definition.schema("Dispensing"), disp, true, function(def, schema, obj) {
+    	if (def.no < 0) {
+        return;
+      }
+
+      var values = _(definition.props[def.no]).map(function(prop) {
+        return prop.dbType === "DATE" ? moment(obj[prop.dbName]).format("YYYYMMDD") : obj[prop.dbName];
+      });
+
+      if (def.no === 55 && !values[0]) {
+        return;
+      }
+      if (def.no !== 0) {
+        values.unshift(def.no.toString());
+      }
+
+      var lastIndex = _(values).findLastIndex(function(val) {
+        return val !== null;
+      });
+
+      addRow(values.slice(0, lastIndex + 1));
+    }).then(function() {
       return csv;
     });
 
     function addRow(array) {
       csv += array.join(",") + "\r\n";
     }
+  },
 
-    function fetchChildren(def, schema, isSingle) {
-      var innerPromise = Promise.resolve();
-      return  new Promise(function(resolve, reject) {
-        if (isSingle) {
-          if (schema) {
-            generate(schema);
-          }
-          resolve();
-        } else {
-          new Promise(function(resolve, reject) {
-            schema.list(function(list) {
-              _(list).map(generate);
-              resolve();
-            });
-          }).then(resolve);
+  fetchChildren: function(def, schema, isSingle, proc) {
+  	var self = this;
+
+    var innerPromise = Promise.resolve();
+    return  new Promise(function(resolve, reject) {
+      if (isSingle) {
+        if (schema) {
+          parse(schema);
         }
-      }).then(function() {
-        return innerPromise;
+        resolve();
+      } else {
+        new Promise(function(resolve, reject) {
+          schema.list(function(list) {
+            _(list).map(parse);
+            resolve();
+          });
+        }).then(resolve);
+      }
+    }).then(function() {
+      return innerPromise;
+    });
+
+    function parse(obj) {
+      innerPromise = innerPromise.then(function() {
+      	proc(def, schema, obj);
       });
 
-      function generate(obj) {
+      _(def.children).each(function(childDef) {
         innerPromise = innerPromise.then(function() {
-          if (def.no < 0) {
-            return;
-          }
-
-          var values = _(definition.props[def.no]).map(function(prop) {
-            return prop.dbType === "DATE" ? moment(obj[prop.dbName]).format("YYYYMMDD") : obj[prop.dbName];
-          });
-
-          if (def.no === 55 && !values[0]) {
-            return;
-          }
-          if (def.no !== 0) {
-            values.unshift(def.no.toString());
-          }
-
-          var lastIndex = _(values).findLastIndex(function(val) {
-            return val !== null;
-          });
-
-          addRow(values.slice(0, lastIndex + 1));
-        });
-
-        _(def.children).each(function(childDef) {
-          innerPromise = innerPromise.then(function() {
-            return new Promise(function(resolve, reject) {
-              if (!childDef.isMulti) {
-                obj.fetch(childDef.foreignName, function() {
-                  fetchChildren(childDef, obj[childDef.foreignName], true).then(resolve);
-                });
-              } else {
-                fetchChildren(childDef, obj[childDef.foreignName]).then(resolve);
-              }
-            });
+          return new Promise(function(resolve, reject) {
+            if (!childDef.isMulti) {
+              obj.fetch(childDef.foreignName, function() {
+                self.fetchChildren(childDef, obj[childDef.foreignName], true, proc).then(resolve);
+              });
+            } else {
+              self.fetchChildren(childDef, obj[childDef.foreignName], false, proc).then(resolve);
+            }
           });
         });
-      }
+      });
     }
   },
 
@@ -265,5 +269,33 @@ module.exports = {
     // Handle special case of empty last value.
     if (/,\s*$/.test(text)) a.push('');
     return a;
+  },
+
+  removeEmptyDisp: function(disp) {
+  	var self = this;
+
+  	return new Promise(function(resolve, reject) {
+	  	disp.otcMedicine.count(function(otcs) {
+	  		disp.dispDate.count(function(dates) {
+	  			if (otcs === 0 && dates === 0) {
+	  				self.removeChildren(my.init.definition.schema("Dispensing"), disp).then(resolve);
+	  			} else {
+	  				resolve();
+	  			}
+	  		});
+	  	});
+  	});
+  },
+
+  removeChildren: function(def, entity) {
+  	var entities = [];
+		return this.fetchChildren(def, entity, true, function(def, schema, obj) {
+			entities.push(obj);
+		}).then(function() {
+			_(entities).each(function(entity) {
+				persistence.remove(entity);
+			});
+			return Promise.resolve();
+		});
   },
 }

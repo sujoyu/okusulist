@@ -61,19 +61,23 @@ module.exports = {
 
     $("#confirm-delete").find(".delete").click(function() {
       var id = $(this).data("id");
-      var schema = $(this).data("schema");
+      var schema = $(this).data("schema") || "DispDate";
       if (!id) {
         return;
       }
-      if (!schema) {
-        schema = "DispDate";
-      }
 
       $(this).removeData("id").removeData("schema");
-      my.init.schemas[schema].load(id, function(date) {
-        persistence.remove(date);
-        self.init();
-        Materialize.toast('削除したよ。', 4000);
+      my.init.schemas[schema].load(id, function(entity) {
+        dataFormat.removeChildren(my.init.definition.schema(schema), entity).then(function() {
+          return new Promise(function(resolve, reject) {
+            entity.fetch("dispensing", function(disp) {
+              dataFormat.removeEmptyDisp(disp).then(resolve);
+            });
+          });
+        }).then(function() {
+          self.init();
+          Materialize.toast('削除したよ。', 4000);
+        });
       });
     });
 
@@ -321,7 +325,7 @@ module.exports = {
                     return moment(prop).format("YYYY/MM/DD");
                   }
 
-                  var section = new Section(start + " - " + end + " : " + otc.name, true, otc.id, "OtcMedicine")
+                  var section = new Section(start + " - " + end + " : " + otc.name, "header", otc.id, "OtcMedicine")
                     .addDef(otc, "OtcMedicine", "name", false)
                     .addDef(otc, "OtcMedicine", "startDate", false, parser)
                     .addDef(otc, "OtcMedicine", "endDate", false, parser);
