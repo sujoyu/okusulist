@@ -12,11 +12,8 @@ Android, iOSで動作確認していますが、Appleの開発者登録料が高
 ## スクリーンショット
 
 ![2016-06-10 13 25 36](https://cloud.githubusercontent.com/assets/11418915/16082025/0edd02ba-334b-11e6-8dab-c208c4a3265b.png)
-
 ![2016-06-10 13 26 14](https://cloud.githubusercontent.com/assets/11418915/16082039/20a7548c-334b-11e6-8eb8-b0b94615495a.png)
-
 ![2016-06-10 13 27 53](https://cloud.githubusercontent.com/assets/11418915/16082044/2353817e-334b-11e6-9d7f-f1bee5da50c5.png)
-
 ![2016-06-12 13 56 02](https://cloud.githubusercontent.com/assets/11418915/16082054/28d03cb4-334b-11e6-8b73-97fc4dcccf31.png)
 
 ## 機能
