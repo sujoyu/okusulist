@@ -29,11 +29,22 @@ module.exports = {
       }
     });
 
+    $("#birth").change(function() {
+      var val = $(this).val();
+      if (val) {
+        var duration = moment.duration(moment().diff(new Date(val)));
+        $("#patient-age").val(duration.years() + "歳 " + duration.months() + "ヶ月");
+      } else {
+        $("#patient-age").val("");
+      }
+      Materialize.updateTextFields();
+    });
+
     user.loadOrCreate(function(patient) {
-    	var names = patient.name.split([" ", "　"]);
+    	var names = patient.name.trim().split(/\s/);
     	$("#last_name").val(names[0]);
     	$("#first_name").val(names[1]);
-    	$("#birth").val(patient.birth ? moment(patient.birth).format("YYYY/MM/DD") : "");
+    	$("#birth").val(patient.birth ? moment(patient.birth).format("YYYY/MM/DD") : "").change();
     	$("#contact").val(patient.contact);
     	$("#historyOfAllergy").val(patient.historyOfAllergy).trigger('autoresize');
     	$("#historyOfSideEffect").val(patient.historyOfSideEffect).trigger('autoresize');
@@ -59,16 +70,5 @@ module.exports = {
 
 			return false;
 		});
-
-    $("#birth").change(function() {
-      var val = $(this).val();
-      if (val) {
-        var duration = moment.duration(moment().diff(new Date(val)));
-        $("#patient-age").val(duration.years() + "歳 " + duration.months() + "ヶ月");
-      } else {
-        $("#patient-age").val("");
-      }
-      Materialize.updateTextFields();
-    })
 	}
 }

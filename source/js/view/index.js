@@ -492,13 +492,14 @@ module.exports = {
                   .trigger('autoresize');
                 Materialize.updateTextFields();
                 modal.openModal();
-              })
-            })
+              });
+            });
+
+            return false;
           });
 
         $techo.find(".modal-trigger.delete")
           .click(function(e) {
-            e.preventDefault();
             var submenu = $(this).parents(".techo-submenu");
             var id = submenu.data("id");
             var schema = submenu.data("schema")
@@ -507,10 +508,11 @@ module.exports = {
               schema: schema
             });
             $($(this).attr("href")).openModal();
+
+            return false;
           });
 
         $techo.find(".modal-trigger.qrcode").click(function(e) {
-          e.preventDefault();
           var submenu = $(this).parents(".techo-submenu");
           var id = submenu.data("id");
           var schema = submenu.data("schema") || "DispDate";
@@ -524,8 +526,9 @@ module.exports = {
               dataFormat.generateCsv(disp).then(function(csv) {
                 var n = "\n";
                 var $content = $("#qrcode-content").empty();
-                _(_.range(0, csv.split(n).length, 10)).each(function(i) {
-                  var last = getPos(csv, n, i + 10);
+                var lines = 5;
+                _(_.range(0, csv.split(n).length, lines)).each(function(i) {
+                  var last = getPos(csv, n, i + lines);
                   var partial = csv.substring(getPos(csv, n, i), last > csv.length ? csv.length : last);
                   var $tmp = $("<div></div>").appendTo($content);
                   new QRCode($tmp[0], partial);
@@ -533,6 +536,8 @@ module.exports = {
               });
             });
           });
+
+          return false;
         });
 
         $techo.find(".techo-okusuri-button").click(function() {
@@ -551,6 +556,8 @@ module.exports = {
           query[searchQuery] = Encoding.toHankakuCase(name);
 
           window.cordova.InAppBrowser.open(self.buildUrl(url, query), '_system');
+
+          return false;
         });
 
         my.user.isEmpty(function(empty) {

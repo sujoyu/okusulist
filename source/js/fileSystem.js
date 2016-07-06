@@ -275,44 +275,7 @@ module.exports = {
 
       $fileList.append($fragment);
     }
-
-    // if (this.isPc) {
-    //    var files = [
-    //   {
-    //     isDirectory: true,
-    //      isFile: false,
-    //      name: "hogeaaaaaaaaaaaaaaaaaa",
-    //      toURL: function() {
-    //        return path + "/" + this.name + "/"
-    //      }
-    //    },{
-    //      isDirectory: true,
-    //      isFile: false,
-    //      name: "fugaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    //      toURL: function() {
-    //        return path + "/" + this.name + "/"
-    //      }
-    //    },{
-    //      isDirectory: false,
-    //      isFile: true,
-    //      name: "piyo",
-    //      toURL: function() {
-    //        return path + "/" + this.name
-    //      }
-    //    },{
-    //      isDirectory: false,
-    //      isFile: true,
-    //      name: "piyopiyoaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    //      toURL: function() {
-    //        return path + "/" + this.name
-    //      }
-    //    },
-    //  ];
-
-    //   refreshFiles(files);
-    // } else {
-      this.readFileList(path, refreshFiles);
-    // }
+    this.readFileList(path, refreshFiles);
   },
 
   readFileList: function(path, callback) {
